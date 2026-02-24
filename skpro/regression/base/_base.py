@@ -541,30 +541,26 @@ class BaseProbaRegressor(BaseEstimator):
         # 2. default to proba if proba or var are implemented
 
         if implements_interval:
-            pred_int = pd.DataFrame()
+            pred_quantiles = []
             for a in alpha:
                 # compute quantiles corresponding to prediction interval coverage
                 #  this uses symmetric predictive intervals:
                 coverage = abs(1 - 2 * a)
+                side = "lower" if a < 0.5 else "upper"
 
                 # compute quantile predictions corresponding to upper/lower
                 pred_a = self._predict_interval(X=X, coverage=[coverage])
-                pred_int = pd.concat([pred_int, pred_a], axis=1)
+                # Select only the correct side for each variable
+                # pred_a columns are [variable, coverage, lower_upper]
+                pred_a_side = pred_a.xs((coverage, side), level=(1, 2), axis=1)
+                pred_quantiles.append(pred_a_side)
 
-            # now we need to subset to lower/upper depending
-            #   on whether alpha was < 0.5 or >= 0.5
-            #   this formula gives the integer column indices giving lower/upper
-            col_selector_int = (np.array(alpha) >= 0.5) + 2 * np.arange(len(alpha))
-            col_selector_bool = np.isin(np.arange(2 * len(alpha)), col_selector_int)
-            num_var = len(pred_int.columns.get_level_values(0).unique())
-            col_selector_bool = np.tile(col_selector_bool, num_var)
+            # concat across alphas, using alpha as second level of MultiIndex
+            pred_int = pd.concat(pred_quantiles, axis=1, keys=alpha)
+            # swap levels to [variable, alpha]
+            pred_int = pred_int.reorder_levels([1, 0], axis=1)
 
-            pred_int = pred_int.iloc[:, col_selector_bool]
-            # change the column labels (multiindex) to the format for intervals
-            # idx returned by _predict_interval is
-            #   3-level MultiIndex with variable names, coverage, lower/upper
-            # idx returned by _predict_quantiles should be
-            #   is 2-level MultiIndex with variable names, alpha
+            # ensure columns are correctly named according to _get_columns
             int_idx = self._get_columns(method="predict_quantiles", alpha=alpha)
             pred_int.columns = int_idx
 

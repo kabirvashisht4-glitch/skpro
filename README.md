@@ -198,7 +198,7 @@ specification: all kinds of contributions are welcome - not just code.
 [developer guides]: https://skpro.readthedocs.io/en/latest/developer_guide.html
 [contributors]: https://github.com/sktime/skpro/graphs/contributors
 [governance]: https://www.sktime.net/en/latest/get_involved/governance.html
-[mentoring]: https://github.com/sktime/mentoring
+[mentoring]: https://github.com/gc-os-ai/mentoring-projects/blob/main/2026/ideas_list.md
 [meetings]: https://calendar.google.com/calendar/u/0/embed?src=sktime.toolbox@gmail.com&ctz=UTC
 [roles]: https://www.sktime.net/en/latest/about/team.html
 
