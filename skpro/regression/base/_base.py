@@ -558,7 +558,7 @@ class BaseProbaRegressor(BaseEstimator):
             # concat across alphas, using alpha as second level of MultiIndex
             pred_int = pd.concat(pred_quantiles, axis=1, keys=alpha)
             # swap levels to [variable, alpha]
-            pred_int = pred_int.reorder_levels([1, 0], axis=1)
+            pred_int = pred_int.reorder_levels([1, 0], axis=1).sort_index(axis=1)
 
             # ensure columns are correctly named according to _get_columns
             int_idx = self._get_columns(method="predict_quantiles", alpha=alpha)
