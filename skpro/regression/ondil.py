@@ -184,7 +184,7 @@ class OndilOnlineGamlss(BaseProbaRegressor):
         else:
             try:
                 df = pd.DataFrame(params)
-            except Exception as e:  # noqa: B902
+            except Exception as e:  # noqa: BLE001
                 raise TypeError("Unrecognized predict output from ondil: %s" % e)
 
         # decide mapping based on requested distribution

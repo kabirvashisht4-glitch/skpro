@@ -54,6 +54,51 @@ def get_path_from_module(module_str):
 
 
 @lru_cache
+def get_merge_base_ref():
+    """Return the preferred git reference to diff against, if available.
+
+    Returns
+    -------
+    str or None
+        First available base reference among common local and remote main branches.
+        Returns None when no suitable reference is available.
+    """
+    candidate_refs = (
+        "remotes/origin/main",
+        "remotes/origin/master",
+        "main",
+        "master",
+    )
+
+    for ref in candidate_refs:
+        try:
+            subprocess.check_output(
+                ["git", "rev-parse", "--verify", ref],
+                text=True,
+                stderr=subprocess.DEVNULL,
+            )
+        except subprocess.CalledProcessError:
+            continue
+        else:
+            return ref
+
+    return None
+
+
+def _run_git_diff(file_path):
+    """Return git diff output for a file against the configured merge base."""
+    merge_base_ref = get_merge_base_ref()
+    if merge_base_ref is None:
+        return None
+
+    return subprocess.check_output(
+        ["git", "diff", merge_base_ref, "--", file_path],
+        text=True,
+        encoding="utf-8",
+    )
+
+
+@lru_cache
 def is_module_changed(module_str):
     """Check if a module has changed compared to the main branch.
 
@@ -65,10 +110,9 @@ def is_module_changed(module_str):
         module string, e.g., sktime.forecasting.naive
     """
     module_file_path = get_path_from_module(module_str)
-    cmd = f"git diff remotes/origin/main -- {module_file_path}"
     try:
-        output = subprocess.check_output(cmd, shell=True, text=True, encoding="utf-8")
-        return bool(output)
+        output = _run_git_diff(module_file_path)
+        return output is None or bool(output)
     except subprocess.CalledProcessError:
         return True
 
@@ -107,22 +151,18 @@ def get_changed_lines(file_path, only_indented=True):
     -------
     list of str : changed or added lines on current branch
     """
-    cmd = f"git diff remotes/origin/main -- {file_path}"
-
     try:
-        # Run 'git diff' command to get the changes in the specified file
-        result = subprocess.check_output(cmd, shell=True, text=True)
+        result = _run_git_diff(file_path)
+        if result is None:
+            return []
 
-        # if only indented lines are requested, add space to start_chars
         start_chars = "+"
         if only_indented:
             start_chars += " "
 
-        # Extract the changed or new lines and return as a list of strings
         changed_lines = [
             line.strip() for line in result.split("\n") if line.startswith(start_chars)
         ]
-        # remove first character ('+') from each line
         changed_lines = [line[1:] for line in changed_lines]
 
         return changed_lines
@@ -182,7 +222,6 @@ def _get_packages_with_changed_specs():
         else:
             packages.append(pkg)
 
-    # make unique
     packages = tuple(set(packages))
 
     return packages

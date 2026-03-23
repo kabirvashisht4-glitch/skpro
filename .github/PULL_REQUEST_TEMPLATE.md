@@ -44,8 +44,8 @@ Please go through the checklist below. Please feel free to remove points if they
 -->
 
 ##### For all contributions
-- [ ] I've added myself to the [list of contributors](https://github.com/sktime/skpro/blob/main/CONTRIBUTORS.md) with any new badges I've earned :-)
-  How to: add yourself to the [all-contributors file](https://github.com/sktime/skpro/blob/main/.all-contributorsrc) in the `skpro` root directory (not the `CONTRIBUTORS.md`). Common badges: `code` - fixing a bug, or adding code logic. `doc` - writing or improving documentation or docstrings. `bug` - reporting or diagnosing a bug (get this plus `code` if you also fixed the bug in the PR).`maintenance` - CI, test framework, release.
+- [ ] I've added myself to the [list of contributors](https://github.com/sktime/skpro/blob/main/docs/source/about/contributors.md) with any new badges I've earned :-)
+  How to: add yourself to the [all-contributors file](https://github.com/sktime/skpro/blob/main/.all-contributorsrc) in the `skpro` root directory (not the generated `docs/source/about/contributors.md` page). Common badges: `code` - fixing a bug, or adding code logic. `doc` - writing or improving documentation or docstrings. `bug` - reporting or diagnosing a bug (get this plus `code` if you also fixed the bug in the PR).`maintenance` - CI, test framework, release.
   See here for [full badge reference](https://allcontributors.org/docs/en/emoji-key)
 - [ ] The PR title starts with either [ENH], [MNT], [DOC], or [BUG]. [BUG] - bugfix, [MNT] - CI, test framework, [ENH] - adding or improving code, [DOC] - writing or improving documentation or docstrings.
 
